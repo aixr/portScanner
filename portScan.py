@@ -13,6 +13,7 @@ class scanport:
     
     def __init__(self, host, ports, timeout):
         self.openPorts = []
+        self.closedPorts= []
         self.host=host
         self.ports=ports
         self.timeout=timeout
@@ -26,16 +27,19 @@ class scanport:
         except socket.error:
             s.close()
             scan = "Port: %s - Closed" % str(port)
-            return scan
+            self.closedPorts.append(scan)
+            return 0
         s.close()
         scan = "Port: %s - Open" % str(port)
-        return scan
+        self.openPorts.append(scan)
+        return 0
     
     def startScan(self):
         for i in range(0, len(self.ports)):
-            self.openPorts.append(self.scan(self.host, self.ports[i], self.timeout))
+            self.scan(self.host, self.ports[i], self.timeout)
 
-        print self.openPorts
+        for x in range(0, len(self.openPorts)):
+            print self.openPorts[x]
 
     """def multiPort(host, port, a, b, scan):
     #Attempt to connect to a port on a host to see if it is open
