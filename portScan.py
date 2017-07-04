@@ -3,6 +3,7 @@ import subprocess
 import os
 import multiprocessing
 import sys
+import time
     
 class scanport:
     """Attempt to connect to a port on a host to see if it is open
@@ -35,53 +36,39 @@ class scanport:
         return 0
     
     def startScan(self):
-        for i in range(0, len(self.ports)):
-            self.scan(self.host, self.ports[i], self.timeout)
+        print "Starting port scan(s)."
+        jobs=[]
+        t1=time.time()
+        if len(self.ports) > 5:
+            count=0
+            for i in range(0, len(self.ports)):
+                p=multiprocessing.Process(target=self.scan, args=(self.host, self.ports[i], self.timeout,))
+                jobs.append(p)
+                p.start()
+                count+=1
+                if count >= 4:
+                    count=0
+                    p.join()
+                
+            p.join()
+        else:
+            for i in range(0, len(self.ports)):
+                self.scan(self.host, self.ports[i], self.timeout)
 
+        if len(self.openPorts) == 0:
+            print "No open ports were found."
         for x in range(0, len(self.openPorts)):
             print self.openPorts[x]
-
-    """def multiPort(host, port, a, b, scan):
-    #Attempt to connect to a port on a host to see if it is open
-    #:param host: Host IP to scan
-    #:param port: Port to scan
-        openPort = []
-        for port in range(a, b):     
-            s = socket.socket()
-            s.settimeout(0.05)
-            try:
-                s.connect((host, port))
-            except socket.error:
-                s.close()
-                continue
-            print "Port:   "+str(port)+"\t\t"+" Open"
-            openPort.append("Port: "+str(port)+" Open")
-            s.close()
-        qu.put(openPort)
-        return 0
-
-    if port == 0:
-        jobs = []; scan = []
-        a = 1; b = 400
-        qu = multiprocessing.Queue()
-        for i in range(1, 4):
-            p = multiprocessing.Process(target=multiPort, args=(host, port, a, b,scan,))
-            jobs.append(p)
-            p.start()
-            a = a + 400
-            b = b + 400
-        p.join()
-        while not qu.empty():
-            scan.append(qu.get())
-    #scan = multiPort(host, port)
-    else:"""
+        t2=time.time()
+        elapsed=t2-t1
+        print "Time elapsed: %s" % str(elapsed)
             
 
 def getPing(host):
     #obtains average ping to host
     #Used to calculate timeout of portscan.
     print "Testing response time of target..."
-    p = subprocess.Popen(['ping', '-q', '-c', '1', host], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['ping', '-q', '-c', '10', host], stdout=subprocess.PIPE)
     ret=p.communicate()
 
     try:
@@ -172,5 +159,6 @@ def start():
     elif function == 'all':
         allScan(host, timeout)
  
-    
+    print "fin"
+
 start()
