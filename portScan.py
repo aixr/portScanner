@@ -91,6 +91,23 @@ def getPing(host):
     maxx=maxx[-2]
     return maxx
 
+def commonScan(host, timeout):
+    f=open('commonPorts.txt', 'r')
+    common=f.read()
+    common=common.replace(' ', '')
+    ports=common.split(',')
+
+    for i in range(0, len(ports)):
+        try:
+            ports[i]=int(ports[i])
+        except:
+            print "There was an error with the file."
+            sys.exit()
+    
+    sp=scanport(host, ports, timeout)
+    sp.startScan()
+
+    
 def singleScan(host, timeout):
     
     tmpPorts=raw_input("Enter port(s) you would like to scan: ")
