@@ -1,16 +1,10 @@
 import socket
 import subprocess
-import os
 import multiprocessing
 import sys
 import time
     
 class scanport:
-    """Attempt to connect to a port on a host to see if it is open
-    :param host: Host IP to scan
-    :param port: Port to scan
-    """
-
     
     def __init__(self, host, ports, timeout):
         self.openPorts = []
@@ -116,6 +110,19 @@ def singleScan(host, timeout):
     sp=scanport(host, ports, timeout)
     sp.startScan()
     
+def singleScanArgs(host, timeout, ports):
+    
+    for i in range(0, len(ports)):
+        try:
+            ports[i]=int(ports[i])
+        except:
+            print "There was an error with the ports you input. Try again."
+            print ports
+            sys.exit()
+            
+    sp=scanport(host, ports, timeout)
+    sp.startScan()
+    
 def start():
     
     host=raw_input("Enter target IP: ")
@@ -157,8 +164,59 @@ def start():
     elif function == 'common':
         commonScan(host, timeout)
     elif function == 'all':
-        allScan(host, timeout)
- 
-    print "fin"
+        print "Not yet implemented."
+        #allScan(host, timeout)
 
-start()
+def startArgs():
+    if '-t' in sys.argv:
+        for i in range(0, len(sys.argv)):
+            if sys.argv[i] == '-t':
+                try:
+                    if sys.argv[i+1][0] != '-':
+                        host=sys.argv[i+1]
+                    else:
+                        sys.exit()
+                    
+                except:
+                    print "Could not find target IP."
+                    sys.exit()
+                    
+    else:
+        print "No target IP given."
+        sys.exit()
+                
+    if '-c' in sys.argv:
+        timeout=(float(getPing(host))*2)/1000
+        commonScan(host, timeout)
+    elif '-s' in sys.argv:
+        for i in range(0, len(sys.argv)):
+            if sys.argv[i]=='-s':
+                try:
+                    if sys.argv[i+1][0] != '-':
+                        ports=sys.argv[i+1]
+                    else:
+                        sys.exit()
+                except:
+                    print "Could not find port(s) after -s."
+                    sys.exit()
+                if ',' in ports:
+                    ports=ports.split(',')
+                else:
+                    port=[]
+                    port.append(ports)
+                    ports=port
+                timeout=(float(getPing(host))*2)/1000
+                singleScanArgs(host, timeout, ports)
+                
+    elif '-a' in sys.argv:
+        print "Not yet implemented."
+        sys.exit()
+    else:
+        print "Check arugements given. \nMust have:\n\t-t <target IP>\nAnd one of the following:\n\t-c --Common ports scan.\n\t-s <port> <port,port,...,port> --single/direct ports scan\n\t-a --all ports scan"
+        sys.exit()
+        
+
+if len(sys.argv) > 0:
+    startArgs()
+else:
+    start()
