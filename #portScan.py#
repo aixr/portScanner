@@ -91,6 +91,8 @@ def getPing(host):
     maxx=maxx[-2]
     return maxx
 
+def commonScan(host, timeout):
+
 def singleScan(host, timeout):
     
     tmpPorts=raw_input("Enter port(s) you would like to scan: ")
