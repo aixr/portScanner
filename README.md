@@ -15,7 +15,9 @@ python portScan.py [arguments]
 ```
 
 Run without any arguments and select target IP and mode in the program.
-Run with arguments to select IP and functions.
+
+Run with arguments to select IP and functions from CLI.
+
 #### Arguments:
 - Must include target IP/address: 
 `-t [ip/address]`
