@@ -26,3 +26,5 @@ Run with arguments to select IP and functions.
 
 #### To do:
 - Add all ports function
+
+Use it responsibly and ethically :^)
