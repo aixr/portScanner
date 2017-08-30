@@ -216,7 +216,7 @@ def startArgs():
         sys.exit()
         
 
-if len(sys.argv) > 0:
+if len(sys.argv) > 1:
     startArgs()
 else:
     start()
